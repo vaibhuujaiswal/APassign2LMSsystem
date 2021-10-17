@@ -36,15 +36,64 @@ public class Main {
         }
     }
 
+
+    static void instructorMenu (){
+        boolean instructorCondition = true;
+        while(instructorCondition){
+            printMenu(2);
+            Scanner scan = new Scanner(System.in);
+            int instructorOption = scan.nextInt();
+            switch (instructorOption){
+                case 1 : //Add class material
+                    break;
+                case 2: // Add assessments
+                    break;
+                case 3: //View lecture materials
+                    break;
+                case 4: //View assessments
+                    break;
+                case 5: //Grade assessments
+                    break;
+                case 6: //Close assessment
+                    break;
+                case 7: //View comments
+                    break;
+                case 8 : //Add comments
+                    break;
+                case 9: //Logout
+                    instructorCondition = false;
+                    break;
+                default:
+                    System.out.println("Invalid Entry! Please enter the correct option from the instructor menu table");
+            }
+        }
+    }
     static void studentMenu (){
         boolean studentCondition = true;
         while(studentCondition){
-
+            printMenu(3);
+            Scanner scan = new Scanner(System.in);
+            int studentOption = scan.nextInt();
+            switch (studentOption){
+                case 1 : //View lecture materials
+                    break;
+                case 2: //View assessments
+                    break;
+                case 3: //Submit assessment
+                    break;
+                case 4: //View grades
+                    break;
+                case 5: //View comments
+                    break;
+                case 6: //Add comments
+                    break;
+                case 7: //Logout
+                    studentCondition = false;
+                    break;
+                default:
+                    System.out.println("Invalid Entry! Please enter the correct option from the student menu table");
+            }
         }
-
-    }
-    static void instructorMenu (){
-
     }
 
     public static void main(String[] args) {
@@ -64,7 +113,7 @@ public class Main {
                     backPackOption = false;
                     break;
                 default:
-                    System.out.println("Please enter the correct value for the menu!");
+                    System.out.println("Invalid Entry! Please enter the correct option from the BackPack login menu table");
                 }
             }
     }
