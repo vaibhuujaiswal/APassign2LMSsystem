@@ -112,6 +112,7 @@ class AssessmentInfo {
     private String submission;
     private boolean gradedAssess;
     private boolean submittedAssess;
+    private Instructor instructorName;
 
     public void setGradedAssess(boolean gradedAssess) {
         this.gradedAssess = gradedAssess;
@@ -127,6 +128,14 @@ class AssessmentInfo {
 
     public double getGrade() {
         return grade;
+    }
+
+    public Instructor getInstructorName() {
+        return instructorName;
+    }
+
+    public void setInstructorName(Instructor instructorName) {
+        this.instructorName = instructorName;
     }
 
     public String getSubmission() {
@@ -367,9 +376,45 @@ public class Main {
                     }
                 case 5: //Grade assignments
 
+                    ArrayList<Integer> gradeAssignmentID = new ArrayList<Integer>();
+                    System.out.println("List of Assignments to Solve: ");
+                    int cnt = 0;
+                    for (int av = 0; av < assessmentList.size(); av++) {
+                        if (assessmentList.get(av).isAssignStatus()) {
+                            System.out.print("ID: " + cnt + " " + assessmentList.get(av).getAssignType() + assessmentList.get(av).getAssignQuestion());
+                            if (assessmentList.get(av).getAssignType().equalsIgnoreCase("Assignment")) {
+                                System.out.print(assessmentList.get(av).getAssignMaxMarks());
+                            }
+                            System.out.println("----------------------------");
+                            cnt++;
+                            gradeAssignmentID.add(av);
+                        }
+                    }
+                    ArrayList<Integer> studentSubmissionList = new ArrayList<Integer>();
+                    int assessChoosen = scan.nextInt();
+                    int studentCount = 0;
+                    for (int studen = 0; studen < studentList.size(); studen++){
+                        if (assessmentList.get(gradeAssignmentID.get(assessChoosen)).getAssignSubmission().get(studen).isSubmittedAssess()){
+                            studentSubmissionList.add(studen);
+                            System.out.println(studentCount + " - " + assessmentList.get(gradeAssignmentID.get(assessChoosen)).getAssignSubmission().get(studen).getStudentInfo().getStudentName());
+                        }
+                    }
+                    if (studentSubmissionList.size() == 0){
+                        System.out.println("All Students have been graded for this assignment!, Please go to the next assignment!");
+                        break;
+                    }
+                    int studentChoose = scan.nextInt();
+                    System.out.println("Submission: " + assessmentList.get(gradeAssignmentID.get(assessChoosen)).getAssignSubmission().get(studentChoose).getSubmission());
+                    System.out.println("Max Marks: " + assessmentList.get(gradeAssignmentID.get(assessChoosen)).getAssignMaxMarks());
+                    System.out.println("Marks scored: ");
+                    double marksScored = scan.nextDouble();
+                    assessmentList.get(gradeAssignmentID.get(assessChoosen)).getAssignSubmission().get(studentChoose).setGrade(marksScored);
+                    assessmentList.get(gradeAssignmentID.get(assessChoosen)).getAssignSubmission().get(studentChoose).setGradedAssess(true);
+                    assessmentList.get(gradeAssignmentID.get(assessChoosen)).getAssignSubmission().get(studentChoose).setInstructorName(loginedInstructor);
+
                     break;
                 case 6://Close assessment
-                    int cnt = 0;
+                    cnt = 0;
                     ArrayList<Integer> openAssignmentID = new ArrayList<Integer>();
                     System.out.println("List of Open Assignments (Available to Close: ");
                     for (int av = 0; av < assessmentList.size(); av++) {
@@ -387,8 +432,9 @@ public class Main {
                     int idToClose = scan.nextInt();
                     if (idToClose < 0 || idToClose > openAssignmentID.size()) {
                         assessmentList.get(openAssignmentID.get(idToClose)).setAssignStatus(false);
+                        break;
                     }
-                            break;
+
                         case 7: //View comments
                             for (int ico = 0; ico < commentList.size(); ico++){
                                 commentList.get(ico).view();
@@ -410,13 +456,13 @@ public class Main {
         static void studentMenu(){
             Scanner scan = new Scanner(System.in);
             boolean studentCondition = true;
-            while(studentCondition){
+            while(studentCondition) {
                 System.out.println("Students:\n");
-                for (int inst = 0; inst < studentList.size(); inst++){
+                for (int inst = 0; inst < studentList.size(); inst++) {
                     System.out.println(inst + "-" + studentList.get(inst));
                 }
                 int studentID = scan.nextInt();
-                if ((studentID > studentList.size()) || (studentID < 0)){
+                if ((studentID > studentList.size()) || (studentID < 0)) {
                     System.out.println("INVALID TYPE! Choosen option out of Student Menu option! Please Try again!");
                 }
                 Student loginedStudent = studentList.get(studentID);
@@ -424,24 +470,20 @@ public class Main {
                 System.out.println("Welcome" + studentList.get(studentID).getStudentName());
                 printMenu(3);
                 int studentOption = scan.nextInt();
-                switch (studentOption){
-                    case 1 : //View lecture materials
-                        for (int lm = 0; lm < materialList.size(); lm++){
+                switch (studentOption) {
+                    case 1: //View lecture materials
+                        for (int lm = 0; lm < materialList.size(); lm++) {
                             materialList.get(lm).view();
                         }
                         break;
                     case 2: //View assessments
                         System.out.println("List of Assignments to View: ");
-                        int count = 0;
                         for (int vav = 0; vav < assessmentList.size(); vav++) {
-                            if (assessmentList.get(vav).isAssignStatus()) {
-                                System.out.print("ID: " + count + " " + assessmentList.get(vav).getAssignType() + assessmentList.get(vav).getAssignQuestion());
-                                if (assessmentList.get(vav).getAssignType().equalsIgnoreCase("Assignment")){
-                                    System.out.print(assessmentList.get(vav).getAssignMaxMarks());
-                                }
-                                System.out.println("----------------------------");
-                                count++;
+                            System.out.print("ID: " + vav + " " + assessmentList.get(vav).getAssignType() + assessmentList.get(vav).getAssignQuestion());
+                            if (assessmentList.get(vav).getAssignType().equalsIgnoreCase("Assignment")) {
+                                System.out.print(assessmentList.get(vav).getAssignMaxMarks());
                             }
+                            System.out.println("----------------------------");
                         }
                         break;
                     case 3: //Submit assessment
@@ -479,11 +521,27 @@ public class Main {
 
 
                             if (assessmentList.get(openAssignmentID2.get(idToUse)).getAssignType().equalsIgnoreCase("Quiz")) {
-
+                                assessmentList.get(openAssignmentID2.get(idToUse)).getAssignQuestion();
+                                String quizAnswer = scan.next();
+                                assessmentList.get(openAssignmentID2.get(idToUse)).getAssignSubmission().get(studentID).setSubmission(quizAnswer);
+                                assessmentList.get(openAssignmentID2.get(idToUse)).getAssignSubmission().get(studentID).setSubmittedAssess(true);
+                                break;
                             }
                         }
                         break;
                     case 4: //View grades
+                        for (int ast = 0; ast < assessmentList.size(); ast++){
+                            if (assessmentList.get(ast).getAssignSubmission().get(studentID).isGradedAssess()) {
+                                System.out.println("Graded submissions");
+                                System.out.println("Submission: " + assessmentList.get(ast).getAssignSubmission().get(studentID).getSubmission());
+                                System.out.println("Marks : " + assessmentList.get(ast).getAssignSubmission().get(studentID).getGrade());
+                                System.out.println("Graded by : " + assessmentList.get(ast).getAssignSubmission().get(studentID).getInstructorName());
+                            }
+                            else if ((assessmentList.get(ast).getAssignSubmission().get(studentID).isSubmittedAssess()) && (!assessmentList.get(ast).getAssignSubmission().get(studentID).isGradedAssess())){
+                                System.out.println("Ungraded submissions");
+                                System.out.println("Submission: " + assessmentList.get(ast).getAssignSubmission().get(studentID).getSubmission());
+                            }
+                        }
 
                         break;
                     case 5: //View comments
