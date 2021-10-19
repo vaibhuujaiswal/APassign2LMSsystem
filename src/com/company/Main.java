@@ -23,6 +23,11 @@ class Instructor{
     public String getInstructorName() {
         return instructorName;
     }
+
+    @Override
+    public String toString() {
+        return this.instructorName;
+    }
 }
 
 class Slides implements View{
@@ -277,6 +282,10 @@ public class Main {
         }
     }
 
+    static String takeFullLineWithSpaceInput(Scanner scan) {
+        return scan.next() + scan.nextLine();
+    }
+
 
     static void instructorMenu (){
         Scanner scan = new Scanner(System.in);
@@ -300,31 +309,33 @@ public class Main {
                     System.out.println("1. Add Lecture Slide\n" +
                             "2. Add Lecture Video");
                     int lectureMaterial = scan.nextInt();
-                    switch (lectureMaterial){
+                    switch (lectureMaterial) {
                         case 1: //add lecture slides
                             System.out.println("Enter topic of slides: ");
-                            String topicLecture = scan.next();
+                            String topicLecture = takeFullLineWithSpaceInput(scan);
+                            System.out.println("topicLecture = " + topicLecture);
                             System.out.println("Enter number of slides: ");
                             int numOfSlides = scan.nextInt();
+                            System.out.println("numOfSlides = " + numOfSlides);
                             if (numOfSlides <= 0){
                                 System.out.println("INVALID entry! Number of slides should be greater than zero. Try again!");
                                 break;
                             }
                             for (int i = 0; i < numOfSlides; i++ ){
                                 System.out.println("Content of slide " + (i+1) + " : ");
-                                String content = scan.next();
+                                String content = takeFullLineWithSpaceInput(scan);
                                 tempContentArrayList.add(content);
                             }
 
-                            Date date=new Date(); //Stores the time component in form of a string. This will be used later to be presented
+                            Date date = new Date(); //Stores the time component in form of a string. This will be used later to be presented
                             String timeOfSlideUpload = currentTime();
                             materialList.add(new Slides(topicLecture,tempContentArrayList,timeOfSlideUpload,loginedInstructor,numOfSlides));
                             break;
                         case 2: //add lecture video
                             System.out.println("Enter topic of video: ");
-                            String topicVideo = scan.next();
+                            String topicVideo = takeFullLineWithSpaceInput(scan);
                             System.out.println("Enter filename of video: ");
-                            String fileNameVideo = scan.next();
+                            String fileNameVideo = takeFullLineWithSpaceInput(scan);
 
                             String timeVideoUpload = currentTime();
                             if (!fileNameVideo.endsWith(".mp4")){ //error gen statment, don't remove exclamation point
@@ -346,19 +357,22 @@ public class Main {
                     switch (assessType){
                         case 1: //add assignment
                             System.out.println("Enter problem statement: ");
-                            String problemStatement = scan.next();
+                            String problemStatement = takeFullLineWithSpaceInput(scan);
                             System.out.println("Enter max marks: ");
                             int assignMaxMarks = scan.nextInt();
                             assessmentList.add(new AssessmentMaterial("Assignment", problemStatement,assignMaxMarks,true,tempAssignInfo));
+                            break;
                         case 2:
                             System.out.println("Enter quiz question: ");
-                            String quizQuestion = scan.next();
+                            String quizQuestion = takeFullLineWithSpaceInput(scan);
                             assessmentList.add(new AssessmentMaterial("Quiz",quizQuestion,1,true,tempAssignInfo));
+                            break;
                     }
                     break;
                 case 3: //View lecture materials
                     for (int lm = 0; lm < materialList.size(); lm++){
                         materialList.get(lm).view();
+                        System.out.println("--------------------------------");
                     }
                     break;
                 case 4: //View assessments
@@ -366,14 +380,15 @@ public class Main {
                     int count = 0;
                     for (int av = 0; av < assessmentList.size(); av++) {
                         if (assessmentList.get(av).isAssignStatus()) {
-                            System.out.print("ID: " + count + " " + assessmentList.get(av).getAssignType() + assessmentList.get(av).getAssignQuestion());
+                            System.out.print("ID: " + count + " " + assessmentList.get(av).getAssignType() + " " + assessmentList.get(av).getAssignQuestion());
                             if (assessmentList.get(av).getAssignType().equalsIgnoreCase("Assignment")){
-                                System.out.print(assessmentList.get(av).getAssignMaxMarks());
+                                System.out.print(" " + assessmentList.get(av).getAssignMaxMarks());
                             }
-                            System.out.println("----------------------------");
+                            System.out.println("\n ----------------------------");
                             count++;
                         }
                     }
+                    break;
                 case 5: //Grade assignments
 
                     ArrayList<Integer> gradeAssignmentID = new ArrayList<Integer>();
@@ -381,11 +396,11 @@ public class Main {
                     int cnt = 0;
                     for (int av = 0; av < assessmentList.size(); av++) {
                         if (assessmentList.get(av).isAssignStatus()) {
-                            System.out.print("ID: " + cnt + " " + assessmentList.get(av).getAssignType() + assessmentList.get(av).getAssignQuestion());
+                            System.out.print("ID: " + cnt + " " + assessmentList.get(av).getAssignType() + " " + assessmentList.get(av).getAssignQuestion());
                             if (assessmentList.get(av).getAssignType().equalsIgnoreCase("Assignment")) {
-                                System.out.print(assessmentList.get(av).getAssignMaxMarks());
+                                System.out.print(" " + assessmentList.get(av).getAssignMaxMarks());
                             }
-                            System.out.println("----------------------------");
+                            System.out.println("\n ----------------------------");
                             cnt++;
                             gradeAssignmentID.add(av);
                         }
@@ -394,13 +409,14 @@ public class Main {
                     int assessChoosen = scan.nextInt();
                     int studentCount = 0;
                     for (int studen = 0; studen < studentList.size(); studen++){
-                        if (assessmentList.get(gradeAssignmentID.get(assessChoosen)).getAssignSubmission().get(studen).isSubmittedAssess()){
+                        if (assessmentList.get(gradeAssignmentID.get(assessChoosen)).getAssignSubmission().get(studen).isSubmittedAssess() && (!assessmentList.get(gradeAssignmentID.get(assessChoosen)).getAssignSubmission().get(studen).isGradedAssess())){
                             studentSubmissionList.add(studen);
                             System.out.println(studentCount + " - " + assessmentList.get(gradeAssignmentID.get(assessChoosen)).getAssignSubmission().get(studen).getStudentInfo().getStudentName());
+                            studentCount++;
                         }
                     }
                     if (studentSubmissionList.size() == 0){
-                        System.out.println("All Students have been graded for this assignment!, Please go to the next assignment!");
+                        System.out.println("No submissions have been made for this assignment or the entire assignments have been graded!");
                         break;
                     }
                     int studentChoose = scan.nextInt();
@@ -421,19 +437,21 @@ public class Main {
                         if (assessmentList.get(av).isAssignStatus()) {
                             System.out.print("ID: " + cnt + " " + assessmentList.get(av).getAssignType() + assessmentList.get(av).getAssignQuestion());
                             if (assessmentList.get(av).getAssignType().equalsIgnoreCase("Assignment")){
-                                System.out.print(assessmentList.get(av).getAssignMaxMarks());
+                                System.out.print(" " +assessmentList.get(av).getAssignMaxMarks());
                             }
-                            System.out.println("----------------------------");
+                            System.out.println("\n----------------------------");
                             cnt++;
                             openAssignmentID.add(av);
                         }
                     }
                     System.out.println("Enter id of assignment to close: ");
                     int idToClose = scan.nextInt();
-                    if (idToClose < 0 || idToClose > openAssignmentID.size()) {
-                        assessmentList.get(openAssignmentID.get(idToClose)).setAssignStatus(false);
+                    if (idToClose < 0) {
+                        System.out.println("INVALID ENTRY! PLEASE USE VALUE FROM MENU");
                         break;
                     }
+                    assessmentList.get(openAssignmentID.get(idToClose)).setAssignStatus(false);
+                    break;
 
                         case 7: //View comments
                             for (int ico = 0; ico < commentList.size(); ico++){
@@ -442,7 +460,7 @@ public class Main {
                             break;
                         case 8 : //Add comments
                             System.out.println("Enter comment: ");
-                            String comm = scan.next();
+                            String comm = takeFullLineWithSpaceInput(scan);
                             commentList.add(new Comments(comm,loginedInstructor.getInstructorName(),currentTime()));
                             break;
                         case 9: //Logout
@@ -456,34 +474,34 @@ public class Main {
         static void studentMenu(){
             Scanner scan = new Scanner(System.in);
             boolean studentCondition = true;
+            System.out.println("Students:\n");
+            for (int inst = 0; inst < studentList.size(); inst++) {
+                System.out.println(inst + "-" + studentList.get(inst).getStudentName());
+            }
+            int studentID = scan.nextInt();
+            if ((studentID > studentList.size()) || (studentID < 0)) {
+                System.out.println("INVALID TYPE! Choosen option out of Student Menu option! Please Try again!");
+            }
+            Student loginedStudent = studentList.get(studentID);
             while(studentCondition) {
-                System.out.println("Students:\n");
-                for (int inst = 0; inst < studentList.size(); inst++) {
-                    System.out.println(inst + "-" + studentList.get(inst));
-                }
-                int studentID = scan.nextInt();
-                if ((studentID > studentList.size()) || (studentID < 0)) {
-                    System.out.println("INVALID TYPE! Choosen option out of Student Menu option! Please Try again!");
-                }
-                Student loginedStudent = studentList.get(studentID);
-                int instructorOption = scan.nextInt();
-                System.out.println("Welcome" + studentList.get(studentID).getStudentName());
+                System.out.println("Welcome " + studentList.get(studentID).getStudentName());
                 printMenu(3);
                 int studentOption = scan.nextInt();
                 switch (studentOption) {
                     case 1: //View lecture materials
                         for (int lm = 0; lm < materialList.size(); lm++) {
                             materialList.get(lm).view();
+                            System.out.println("\n----------------------------");
                         }
                         break;
                     case 2: //View assessments
                         System.out.println("List of Assignments to View: ");
                         for (int vav = 0; vav < assessmentList.size(); vav++) {
-                            System.out.print("ID: " + vav + " " + assessmentList.get(vav).getAssignType() + assessmentList.get(vav).getAssignQuestion());
+                            System.out.print("ID: " + vav + " " + assessmentList.get(vav).getAssignType() + " " + assessmentList.get(vav).getAssignQuestion());
                             if (assessmentList.get(vav).getAssignType().equalsIgnoreCase("Assignment")) {
-                                System.out.print(assessmentList.get(vav).getAssignMaxMarks());
+                                System.out.print(" " + assessmentList.get(vav).getAssignMaxMarks());
                             }
-                            System.out.println("----------------------------");
+                            System.out.println("\n ----------------------------");
                         }
                         break;
                     case 3: //Submit assessment
@@ -492,24 +510,28 @@ public class Main {
                         System.out.println("List of Open Assignments (Pending assignment) : ");
                         for (int av = 0; av < assessmentList.size(); av++) {
                             if (assessmentList.get(av).isAssignStatus()) {
-                                if (assessmentList.get(av).getAssignSubmission().get(studentID).isSubmittedAssess()) {
-                                    System.out.print("ID: " + cnt + " " + assessmentList.get(av).getAssignType() + assessmentList.get(av).getAssignQuestion());
+                                if (!(assessmentList.get(av).getAssignSubmission().get(studentID).isSubmittedAssess())) {
+                                    System.out.print("ID: " + cnt + " " + assessmentList.get(av).getAssignType() + " " + assessmentList.get(av).getAssignQuestion());
                                     if (assessmentList.get(av).getAssignType().equalsIgnoreCase("Assignment")) {
-                                        System.out.print(assessmentList.get(av).getAssignMaxMarks());
+                                        System.out.print(" " + assessmentList.get(av).getAssignMaxMarks());
                                     }
-                                    System.out.println("----------------------------");
+                                    System.out.println("\n ----------------------------");
                                     cnt++;
                                     openAssignmentID2.add(av);
                                 }
                             }
                         }
+                        if (openAssignmentID2.size() == 0){
+                            System.out.println("CONGRATS, Go have a life! No pending assignments!");
+                            break;
+                        }
                         System.out.println("Enter id of assignment to add: ");
                         int idToUse = scan.nextInt();
-                        if (idToUse < 0 || idToUse > openAssignmentID2.size()) {
+                        if (!(idToUse < 0 || idToUse > openAssignmentID2.size())) {
                             if (assessmentList.get(openAssignmentID2.get(idToUse)).getAssignType().equalsIgnoreCase("Assignment"))
                             {
                                 System.out.println("Enter filename of assignment: ");
-                                String assignmentSubmission = scan.next();
+                                String assignmentSubmission = takeFullLineWithSpaceInput(scan);
                                 if (!assignmentSubmission.endsWith(".zip")) {
                                     System.out.println("INVALID FILE TYPE! Please upload in .zip format!");
                                     break;
@@ -521,7 +543,7 @@ public class Main {
 
 
                             if (assessmentList.get(openAssignmentID2.get(idToUse)).getAssignType().equalsIgnoreCase("Quiz")) {
-                                assessmentList.get(openAssignmentID2.get(idToUse)).getAssignQuestion();
+                                System.out.println(assessmentList.get(openAssignmentID2.get(idToUse)).getAssignQuestion() + " ");
                                 String quizAnswer = scan.next();
                                 assessmentList.get(openAssignmentID2.get(idToUse)).getAssignSubmission().get(studentID).setSubmission(quizAnswer);
                                 assessmentList.get(openAssignmentID2.get(idToUse)).getAssignSubmission().get(studentID).setSubmittedAssess(true);
@@ -545,13 +567,13 @@ public class Main {
 
                         break;
                     case 5: //View comments
-                        for (int co = 0; co < commentList.size(); co++){
-                            commentList.get(co).view();
+                        for (int ico = 0; ico < commentList.size(); ico++){
+                            commentList.get(ico).view();
                         }
                         break;
                     case 6: //Add comments
                         System.out.println("Enter comment: ");
-                        String commenting = scan.next();
+                        String commenting = takeFullLineWithSpaceInput(scan);
                         commentList.add(new Comments(commenting,loginedStudent.getStudentName(),currentTime()));
                         break;
                     case 7: //Logout
