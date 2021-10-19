@@ -464,10 +464,11 @@ public class Main {
                         System.out.println("Enter id of assignment to add: ");
                         int idToUse = scan.nextInt();
                         if (idToUse < 0 || idToUse > openAssignmentID2.size()) {
-                            if (assessmentList.get(openAssignmentID2.get(idToUse)).getAssignType().equalsIgnoreCase("Assignment"));{
+                            if (assessmentList.get(openAssignmentID2.get(idToUse)).getAssignType().equalsIgnoreCase("Assignment"))
+                            {
                                 System.out.println("Enter filename of assignment: ");
                                 String assignmentSubmission = scan.next();
-                                if (!assignmentSubmission.endsWith(".zip")){
+                                if (!assignmentSubmission.endsWith(".zip")) {
                                     System.out.println("INVALID FILE TYPE! Please upload in .zip format!");
                                     break;
                                 }
@@ -475,7 +476,9 @@ public class Main {
                                 assessmentList.get(openAssignmentID2.get(idToUse)).getAssignSubmission().get(studentID).setSubmittedAssess(true);
                                 break;
                             }
-                            if (assessmentList.get(openAssignmentID2.get(idToUse)).getAssignType().equalsIgnoreCase("Quiz")){
+
+
+                            if (assessmentList.get(openAssignmentID2.get(idToUse)).getAssignType().equalsIgnoreCase("Quiz")) {
 
                             }
                         }
