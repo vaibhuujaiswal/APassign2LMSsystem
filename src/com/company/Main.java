@@ -405,13 +405,15 @@ public class Main {
                             gradeAssignmentID.add(av);
                         }
                     }
+                    System.out.println("Enter ID of assessment to view submissions: ");
                     ArrayList<Integer> studentSubmissionList = new ArrayList<Integer>();
                     int assessChoosen = scan.nextInt();
                     int studentCount = 0;
+                    System.out.println("Choose ID from these ungraded submissions: ");
                     for (int studen = 0; studen < studentList.size(); studen++){
                         if (assessmentList.get(gradeAssignmentID.get(assessChoosen)).getAssignSubmission().get(studen).isSubmittedAssess() && (!assessmentList.get(gradeAssignmentID.get(assessChoosen)).getAssignSubmission().get(studen).isGradedAssess())){
                             studentSubmissionList.add(studen);
-                            System.out.println(studentCount + " - " + assessmentList.get(gradeAssignmentID.get(assessChoosen)).getAssignSubmission().get(studen).getStudentInfo().getStudentName());
+                            System.out.println(studentCount + ". " + assessmentList.get(gradeAssignmentID.get(assessChoosen)).getAssignSubmission().get(studen).getStudentInfo().getStudentName());
                             studentCount++;
                         }
                     }
@@ -424,6 +426,10 @@ public class Main {
                     System.out.println("Max Marks: " + assessmentList.get(gradeAssignmentID.get(assessChoosen)).getAssignMaxMarks());
                     System.out.println("Marks scored: ");
                     double marksScored = scan.nextDouble();
+                    if (marksScored > assessmentList.get(gradeAssignmentID.get(assessChoosen)).getAssignMaxMarks()){
+                        System.out.println("INAVLID Marks by Instructor. Given marks cannot be greater than the maximum marks!");
+                        break;
+                    }
                     assessmentList.get(gradeAssignmentID.get(assessChoosen)).getAssignSubmission().get(studentChoose).setGrade(marksScored);
                     assessmentList.get(gradeAssignmentID.get(assessChoosen)).getAssignSubmission().get(studentChoose).setGradedAssess(true);
                     assessmentList.get(gradeAssignmentID.get(assessChoosen)).getAssignSubmission().get(studentChoose).setInstructorName(loginedInstructor);
@@ -613,5 +619,3 @@ public class Main {
             }
         }
     }
-
-
