@@ -5,7 +5,7 @@ import java.util.*;
 class Student {
     private String studentName;
 
-    public void setStudentName(String studentName) {
+    public Student(String studentName) {
         this.studentName = studentName;
     }
 
@@ -14,11 +14,11 @@ class Student {
     }
 }
 class Instructor{
-    public void setInstructorName(String instructorName) {
+    private String instructorName;
+
+    public Instructor(String instructorName) {
         this.instructorName = instructorName;
     }
-
-    private String instructorName;
 
     public String getInstructorName() {
         return instructorName;
@@ -110,11 +110,43 @@ class AssessmentInfo {
     private Student studentInfo;
     private double grade;
     private String submission;
+    private boolean gradedAssess;
+    private boolean submittedAssess;
 
-    public AssessmentInfo(Student studentInfo, double grade, String submission) {
+    public void setGradedAssess(boolean gradedAssess) {
+        this.gradedAssess = gradedAssess;
+    }
+
+    public void setSubmittedAssess(boolean submittedAssess) {
+        this.submittedAssess = submittedAssess;
+    }
+
+    public Student getStudentInfo() {
+        return studentInfo;
+    }
+
+    public double getGrade() {
+        return grade;
+    }
+
+    public String getSubmission() {
+        return submission;
+    }
+
+    public boolean isGradedAssess() {
+        return gradedAssess;
+    }
+
+    public boolean isSubmittedAssess() {
+        return submittedAssess;
+    }
+
+    public AssessmentInfo(Student studentInfo, double grade, String submission, boolean gradedAssess, boolean submittedAssess) {
         this.studentInfo = studentInfo;
         this.grade = grade;
         this.submission = submission;
+        this.gradedAssess = gradedAssess;
+        this.submittedAssess = submittedAssess;
     }
 
     public void setStudentInfo(Student studentInfo) {
@@ -130,55 +162,15 @@ class AssessmentInfo {
     }
 }
 
-class Quiz implements Add{
-    private String quizQuestion;
-    private final int quizMaxMarks = 1;
-    private boolean quizStatus;
-    private ArrayList<AssessmentInfo> quizSubmission;
-
-    public int getQuizMaxMarks() {
-        return quizMaxMarks;
-    }
-
-    public void setQuizStatus(boolean quizStatus) {
-        this.quizStatus = quizStatus;
-    }
-
-    public boolean isQuizStatus() {
-        return quizStatus;
-    }
-
-    public Quiz(String quizQuestion, boolean quizStatus, ArrayList<AssessmentInfo> quizSubmission) {
-        this.quizQuestion = quizQuestion;
-        this.quizStatus = quizStatus;
-        this.quizSubmission = quizSubmission;
-    }
-
-    public void setQuizQuestion(String quizQuestion) {
-        this.quizQuestion = quizQuestion;
-    }
-
-    public String getQuizQuestion() {
-        return quizQuestion;
-    }
-
-    @Override
-    public void addAssessment() {
-        if (this.isQuizStatus()) {
-            System.out.println("Question: " + this.getQuizQuestion());
-        }
-        this.isQuizStatus();
-    }
-}
-
-class Assignment implements Add{
+class AssessmentMaterial {
+    private String assignType;
     private String assignQuestion;
     private int assignMaxMarks;
     private boolean assignStatus;
     private ArrayList<AssessmentInfo> assignSubmission;
 
-
-    public Assignment(String assignQuestion, int assignMaxMarks, boolean assignStatus, ArrayList<AssessmentInfo> assignSubmission) {
+    public AssessmentMaterial(String assignType, String assignQuestion, int assignMaxMarks, boolean assignStatus, ArrayList<AssessmentInfo> assignSubmission) {
+        this.assignType = assignType;
         this.assignQuestion = assignQuestion;
         this.assignMaxMarks = assignMaxMarks;
         this.assignStatus = assignStatus;
@@ -193,30 +185,41 @@ class Assignment implements Add{
         return assignStatus;
     }
 
+    public void setAssignStatus(boolean assignStatus) {
+        this.assignStatus = assignStatus;
+    }
+
+    public String getAssignType() {
+        return assignType;
+    }
+
     public String getAssignQuestion() {
         return assignQuestion;
     }
-    @Override
-    public void AssignStatus() {
 
-    }
-
-    @Override
-    public void addAssessment() {
-        if (this.isAssignStatus()){
-            System.out.println("Assignment: " + this.getAssignQuestion() + " , " + this.getAssignMaxMarks());
-        }
+    public ArrayList<AssessmentInfo> getAssignSubmission() {
+        return assignSubmission;
     }
 }
 
 
-class Comments{ //it would contain instructor or student ID, the comment, and time stamp
+class Comments implements View{ //it would contain instructor or student ID, the comment, and time stamp
+    private String commentStatement;
+    private String personName;
+    private String timeOfCommenting;
 
+    public Comments(String commentStatement, String personName, String timeOfCommenting) {
+        this.commentStatement = commentStatement;
+        this.personName = personName;
+        this.timeOfCommenting = timeOfCommenting;
+    }
+    @Override
+    public void view() {
+        System.out.println(this.commentStatement + " - " + this.personName);
+        System.out.println(timeOfCommenting + "\n");
+    }
 }
 
-interface Add{
-    public void addAssessment();
-}
 interface View{
     public void view(); //will help us view the required arrays
 }
@@ -225,7 +228,8 @@ public class Main {
     private static ArrayList<Student> studentList = new ArrayList<Student>();
     private static ArrayList<Instructor> instructorList = new ArrayList<Instructor>();
     private static ArrayList<View> materialList = new ArrayList<View>();
-    private static ArrayList<Add> assessmentList = new ArrayList<Add>();
+    private static ArrayList<AssessmentMaterial> assessmentList = new ArrayList<AssessmentMaterial>();
+    private static ArrayList<View> commentList = new ArrayList<View>();
 
     static String currentTime(){
         Date date=new Date(); //Stores the time component in form of a string. This will be used later to be presented
@@ -268,19 +272,19 @@ public class Main {
     static void instructorMenu (){
         Scanner scan = new Scanner(System.in);
         boolean instructorCondition = true;
+        System.out.println("Instructors:\n");
+        for (int inst = 0; inst < instructorList.size(); inst++){
+            System.out.println(inst + "-" + instructorList.get(inst).getInstructorName());
+        }
+        int instructorID = scan.nextInt();
+        if ((instructorID > instructorList.size())|| (instructorID < 0)) {
+            System.out.println("INVALID TYPE! Choosen option out of Menu option! Please Try again!");
+        }
+        Instructor loginedInstructor = instructorList.get(instructorID);
         while(instructorCondition){
-            System.out.println("Instructors:\n");
-            for (int inst = 0; inst < instructorList.size(); inst++){
-                System.out.println(inst + "-" + instructorList.get(inst).getInstructorName());
-            }
-            int instructorID = scan.nextInt();
-            if ((instructorID > instructorList.size())|| (instructorID < 0)) {
-                System.out.println("INVALID TYPE! Choosen option out of Menu option! Please Try again!");
-            }
-            Instructor loginedInstructor = instructorList.get(instructorID);
-            int instructorOption = scan.nextInt();
-            System.out.println("Welcome" + instructorList.get(instructorID).getInstructorName());
+            System.out.println("Welcome " + instructorList.get(instructorID).getInstructorName());
             printMenu(2);
+            int instructorOption = scan.nextInt();
             switch (instructorOption){
                 case 1 : //Add class material
                     ArrayList<String> tempContentArrayList = new ArrayList<String>();
@@ -328,7 +332,7 @@ public class Main {
                     int assessType = scan.nextInt();
                     ArrayList<AssessmentInfo> tempAssignInfo = new ArrayList<AssessmentInfo>();
                     for (Student i: studentList){
-                        tempAssignInfo.add(new AssessmentInfo(i,0,null));
+                        tempAssignInfo.add(new AssessmentInfo(i,0,null,false,false));
                     }
                     switch (assessType){
                         case 1: //add assignment
@@ -336,11 +340,11 @@ public class Main {
                             String problemStatement = scan.next();
                             System.out.println("Enter max marks: ");
                             int assignMaxMarks = scan.nextInt();
-                            assessmentList.add(new Assignment(problemStatement,assignMaxMarks,true,tempAssignInfo));
+                            assessmentList.add(new AssessmentMaterial("Assignment", problemStatement,assignMaxMarks,true,tempAssignInfo));
                         case 2:
                             System.out.println("Enter quiz question: ");
                             String quizQuestion = scan.next();
-                            assessmentList.add(new Quiz(quizQuestion,true,tempAssignInfo));
+                            assessmentList.add(new AssessmentMaterial("Quiz",quizQuestion,1,true,tempAssignInfo));
                     }
                     break;
                 case 3: //View lecture materials
@@ -350,101 +354,181 @@ public class Main {
                     break;
                 case 4: //View assessments
                     System.out.println("List of Assignments to View: ");
-                    for (int av = 0; av < assessmentList.size(); av++){
-                        if assessmentList.get(av)
-                        System.out.print("ID: " + av + " ");
-                        assessmentList.get(av).addAssessment();
-                        System.out.println("----------------");
+                    int count = 0;
+                    for (int av = 0; av < assessmentList.size(); av++) {
+                        if (assessmentList.get(av).isAssignStatus()) {
+                            System.out.print("ID: " + count + " " + assessmentList.get(av).getAssignType() + assessmentList.get(av).getAssignQuestion());
+                            if (assessmentList.get(av).getAssignType().equalsIgnoreCase("Assignment")){
+                                System.out.print(assessmentList.get(av).getAssignMaxMarks());
+                            }
+                            System.out.println("----------------------------");
+                            count++;
+                        }
                     }
+                case 5: //Grade assignments
+
                     break;
-                case 5: //Grade assessments
-                    break;
-                case 6: //Close assessment
-                    System.out.println("List of Open Assignments: ");
-                    for (int oa = 0; oa < assessmentList.size(); oa++){
-                        System.out.print("ID: " + oa + " ");
-                        assessmentList.get(oa).addAssessment();
-                        System.out.println("----------------");
+                case 6://Close assessment
+                    int cnt = 0;
+                    ArrayList<Integer> openAssignmentID = new ArrayList<Integer>();
+                    System.out.println("List of Open Assignments (Available to Close: ");
+                    for (int av = 0; av < assessmentList.size(); av++) {
+                        if (assessmentList.get(av).isAssignStatus()) {
+                            System.out.print("ID: " + cnt + " " + assessmentList.get(av).getAssignType() + assessmentList.get(av).getAssignQuestion());
+                            if (assessmentList.get(av).getAssignType().equalsIgnoreCase("Assignment")){
+                                System.out.print(assessmentList.get(av).getAssignMaxMarks());
+                            }
+                            System.out.println("----------------------------");
+                            cnt++;
+                            openAssignmentID.add(av);
+                        }
                     }
                     System.out.println("Enter id of assignment to close: ");
                     int idToClose = scan.nextInt();
-                    if (idToClose < 0 || idToClose > assessmentList.size()) {
-                        assessmentList.get(idToClose);
+                    if (idToClose < 0 || idToClose > openAssignmentID.size()) {
+                        assessmentList.get(openAssignmentID.get(idToClose)).setAssignStatus(false);
                     }
-                    break;
-                case 7: //View comments
-                    break;
-                case 8 : //Add comments
-                    break;
-                case 9: //Logout
-                    instructorCondition = false;
-                    break;
-                default:
-                    System.out.println("Invalid Entry! Please enter the correct option from the instructor menu table");
+                            break;
+                        case 7: //View comments
+                            for (int ico = 0; ico < commentList.size(); ico++){
+                                commentList.get(ico).view();
+                            }
+                            break;
+                        case 8 : //Add comments
+                            System.out.println("Enter comment: ");
+                            String comm = scan.next();
+                            commentList.add(new Comments(comm,loginedInstructor.getInstructorName(),currentTime()));
+                            break;
+                        case 9: //Logout
+                            instructorCondition = false;
+                            break;
+                        default:
+                            System.out.println("Invalid Entry! Please enter the correct option from the instructor menu table");
+                    }
             }
         }
-    }
-    static void studentMenu(){
-        Scanner scan = new Scanner(System.in);
-        boolean studentCondition = true;
-        while(studentCondition){
-            System.out.println("Students:\n");
-            for (int inst = 0; inst < studentList.size(); inst++){
-                System.out.println(inst + "-" + studentList.get(inst));
+        static void studentMenu(){
+            Scanner scan = new Scanner(System.in);
+            boolean studentCondition = true;
+            while(studentCondition){
+                System.out.println("Students:\n");
+                for (int inst = 0; inst < studentList.size(); inst++){
+                    System.out.println(inst + "-" + studentList.get(inst));
+                }
+                int studentID = scan.nextInt();
+                if ((studentID > studentList.size()) || (studentID < 0)){
+                    System.out.println("INVALID TYPE! Choosen option out of Student Menu option! Please Try again!");
+                }
+                Student loginedStudent = studentList.get(studentID);
+                int instructorOption = scan.nextInt();
+                System.out.println("Welcome" + studentList.get(studentID).getStudentName());
+                printMenu(3);
+                int studentOption = scan.nextInt();
+                switch (studentOption){
+                    case 1 : //View lecture materials
+                        for (int lm = 0; lm < materialList.size(); lm++){
+                            materialList.get(lm).view();
+                        }
+                        break;
+                    case 2: //View assessments
+                        System.out.println("List of Assignments to View: ");
+                        int count = 0;
+                        for (int vav = 0; vav < assessmentList.size(); vav++) {
+                            if (assessmentList.get(vav).isAssignStatus()) {
+                                System.out.print("ID: " + count + " " + assessmentList.get(vav).getAssignType() + assessmentList.get(vav).getAssignQuestion());
+                                if (assessmentList.get(vav).getAssignType().equalsIgnoreCase("Assignment")){
+                                    System.out.print(assessmentList.get(vav).getAssignMaxMarks());
+                                }
+                                System.out.println("----------------------------");
+                                count++;
+                            }
+                        }
+                        break;
+                    case 3: //Submit assessment
+                        int cnt = 0;
+                        ArrayList<Integer> openAssignmentID2 = new ArrayList<Integer>();
+                        System.out.println("List of Open Assignments (Pending assignment) : ");
+                        for (int av = 0; av < assessmentList.size(); av++) {
+                            if (assessmentList.get(av).isAssignStatus()) {
+                                if (assessmentList.get(av).getAssignSubmission().get(studentID).isSubmittedAssess()) {
+                                    System.out.print("ID: " + cnt + " " + assessmentList.get(av).getAssignType() + assessmentList.get(av).getAssignQuestion());
+                                    if (assessmentList.get(av).getAssignType().equalsIgnoreCase("Assignment")) {
+                                        System.out.print(assessmentList.get(av).getAssignMaxMarks());
+                                    }
+                                    System.out.println("----------------------------");
+                                    cnt++;
+                                    openAssignmentID2.add(av);
+                                }
+                            }
+                        }
+                        System.out.println("Enter id of assignment to add: ");
+                        int idToUse = scan.nextInt();
+                        if (idToUse < 0 || idToUse > openAssignmentID2.size()) {
+                            if (assessmentList.get(openAssignmentID2.get(idToUse)).getAssignType().equalsIgnoreCase("Assignment"));{
+                                System.out.println("Enter filename of assignment: ");
+                                String assignmentSubmission = scan.next();
+                                if (!assignmentSubmission.endsWith(".zip")){
+                                    System.out.println("INVALID FILE TYPE! Please upload in .zip format!");
+                                    break;
+                                }
+                                assessmentList.get(openAssignmentID2.get(idToUse)).getAssignSubmission().get(studentID).setSubmission(assignmentSubmission);
+                                assessmentList.get(openAssignmentID2.get(idToUse)).getAssignSubmission().get(studentID).setSubmittedAssess(true);
+                                break;
+                            }
+                            if (assessmentList.get(openAssignmentID2.get(idToUse)).getAssignType().equalsIgnoreCase("Quiz")){
+
+                            }
+                        }
+                        break;
+                    case 4: //View grades
+
+                        break;
+                    case 5: //View comments
+                        for (int co = 0; co < commentList.size(); co++){
+                            commentList.get(co).view();
+                        }
+                        break;
+                    case 6: //Add comments
+                        System.out.println("Enter comment: ");
+                        String commenting = scan.next();
+                        commentList.add(new Comments(commenting,loginedStudent.getStudentName(),currentTime()));
+                        break;
+                    case 7: //Logout
+                        studentCondition = false;
+                        break;
+                    default:
+                        System.out.println("Invalid Entry! Please enter the correct option from the student menu table");
+                }
             }
-            int studentID = scan.nextInt();
-            if ((studentID > studentList.size()) || (studentID < 0)){
-                System.out.println("INVALID TYPE! Choosen option out of Student Menu option! Please Try again!");
-            }
-            Student loginedInstructor = studentList.get(studentID);
-            int instructorOption = scan.nextInt();
-            System.out.println("Welcome" + studentList.get(studentID).getStudentName());
-            printMenu(3);
-            int studentOption = scan.nextInt();
-            switch (studentOption){
-                case 1 : //View lecture materials
-                    for (int lm = 0; lm < materialList.size(); lm++){
-                        materialList.get(lm).view();
-                    }
-                    break;
-                case 2: //View assessments
-                    break;
-                case 3: //Submit assessment
-                    break;
-                case 4: //View grades
-                    break;
-                case 5: //View comments
-                    break;
-                case 6: //Add comments
-                    break;
-                case 7: //Logout
-                    studentCondition = false;
-                    break;
-                default:
-                    System.out.println("Invalid Entry! Please enter the correct option from the student menu table");
+        }
+
+        public static void main(String[] args) {
+            studentList.add(new Student("S0"));
+            studentList.add(new Student("S1"));
+            studentList.add(new Student("S2"));
+            instructorList.add(new Instructor("I0"));
+            instructorList.add(new Instructor("I1"));
+
+            Scanner scan = new Scanner(System.in);
+            boolean backPackOption = true;
+            while (backPackOption){
+                printMenu(1);
+                int menuOption = scan.nextInt();
+                switch(menuOption) {
+                    case 1: //choose instructor menu
+                        instructorMenu();
+                        break;
+                    case 2: //choose student menu
+                        studentMenu();
+                        break;
+                    case 3:
+                        backPackOption = false;
+                        break;
+                    default:
+                        System.out.println("Invalid Entry! Please enter the correct option from the BackPack login menu table");
+                }
             }
         }
     }
 
-    public static void main(String[] args) {
-        Scanner scan = new Scanner(System.in);
-        boolean backPackOption = true;
-        while (backPackOption){
-            printMenu(1);
-	        int menuOption = scan.nextInt();
-            switch(menuOption) {
-                case 1: //choose instructor menu
-                    instructorMenu();
-                    break;
-                case 2: //choose student menu
-                    studentMenu();
-                    break;
-                case 3:
-                    backPackOption = false;
-                    break;
-                default:
-                    System.out.println("Invalid Entry! Please enter the correct option from the BackPack login menu table");
-                }
-            }
-    }
-}
+
